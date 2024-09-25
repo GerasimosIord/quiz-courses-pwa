@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz PWA App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Link to CSS -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <header>
+    <h1>Quiz PWA App</h1>
+  </header>
+  <main>
+    <h2>Select a Course</h2>
+    <div id="course-container">
+      <!-- Course cards will be injected here -->
+    </div>
+    <!-- Add Course Button -->
+    <button id="add-course-btn" class="primary-btn"><i class="fas fa-plus"></i> Add Course</button>
+  </main>
+  <!-- Course Modal -->
+  <div id="course-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <h2>Create a New Course</h2>
+      <input type="text" id="course-name" placeholder="Course Name">
+      <button id="create-course-btn" class="primary-btn">Create Course</button>
+    </div>
+  </div>
+  <!-- Link to JavaScript -->
+  <script src="app.js"></script>
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker Registered'));
+    }
+  </script>
+</body>
+</html>
