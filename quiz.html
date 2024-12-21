@@ -14,16 +14,25 @@
 </head>
 <body>
   <header>
-    <button id="back-btn" class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+    <button id="back-btn" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back
+    </button>
     <h1 id="quiz-title">Quiz Name</h1>
   </header>
   <main>
     <div id="question-container">
       <!-- Questions will be injected here -->
     </div>
+
     <button id="submit-quiz-btn" class="primary-btn">Submit Quiz</button>
     <button id="restart-quiz-btn" class="primary-btn" style="display: none;">Restart Quiz</button>
+
+    <!-- NEW: Export This Quiz button -->
+    <button id="export-quiz-btn" class="primary-btn" style="margin-top: 10px;">
+      <i class="fas fa-download"></i> Export This Quiz
+    </button>
   </main>
+
   <!-- Link to JavaScript -->
   <script src="quiz.js"></script>
 </body>
