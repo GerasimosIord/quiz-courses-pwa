@@ -22,6 +22,9 @@ const quizNameInput = document.getElementById('quiz-name');
 const quizDataInput = document.getElementById('quiz-data');
 const backBtn = document.getElementById('back-btn');
 
+// NEW: Export button
+const exportBtn = document.getElementById('export-data-btn');
+
 // Set course title
 courseTitle.textContent = courses[courseIndex].name;
 
@@ -29,6 +32,7 @@ courseTitle.textContent = courses[courseIndex].name;
 function displayQuizzes() {
   quizContainer.innerHTML = '';
   const quizzes = courses[courseIndex].quizzes;
+
   quizzes.forEach((quiz, index) => {
     const quizCard = document.createElement('div');
     quizCard.className = 'quiz-card';
@@ -82,8 +86,8 @@ function displayQuizzes() {
     });
     quizCard.appendChild(deleteBtn);
 
+    // Navigate to Quiz page unless checkbox/delete is clicked
     quizCard.addEventListener('click', (event) => {
-      // Prevent navigating to quiz if checkbox or delete button is clicked
       if (
         event.target !== checkbox &&
         event.target !== deleteBtn &&
@@ -93,6 +97,7 @@ function displayQuizzes() {
         window.location.href = `quiz.html?courseIndex=${courseIndex}&quizIndex=${index}`;
       }
     });
+
     quizContainer.appendChild(quizCard);
   });
 }
@@ -105,7 +110,40 @@ function deleteQuiz(index) {
   }
 }
 
-// Event Listeners
+// Parse quiz data from input
+function parseQuizData(data) {
+  const lines = data.split('\n');
+  const questions = [];
+  let currentQuestion = null;
+
+  lines.forEach(line => {
+    if (line.startsWith('Q:')) {
+      if (currentQuestion) {
+        questions.push(currentQuestion);
+      }
+      currentQuestion = {
+        question: line.slice(2).trim(),
+        options: [],
+        answer: null,
+        explanation: ''
+      };
+    } else if (line.startsWith('A:')) {
+      currentQuestion.answer = line.slice(2).trim();
+    } else if (line.startsWith('E:')) {
+      currentQuestion.explanation = line.slice(2).trim();
+    } else if (line.startsWith('-')) {
+      currentQuestion.options.push(line.slice(1).trim());
+    }
+  });
+
+  if (currentQuestion) {
+    questions.push(currentQuestion);
+  }
+
+  return questions;
+}
+
+// Events
 addQuizBtn.addEventListener('click', () => {
   quizModal.style.display = 'block';
 });
@@ -117,9 +155,14 @@ closeBtn.addEventListener('click', () => {
 createQuizBtn.addEventListener('click', () => {
   const quizName = quizNameInput.value.trim();
   const quizData = quizDataInput.value.trim();
+
   if (quizName && quizData) {
     const questions = parseQuizData(quizData);
-    courses[courseIndex].quizzes.push({ name: quizName, questions, reviewed: false });
+    courses[courseIndex].quizzes.push({
+      name: quizName,
+      questions,
+      reviewed: false
+    });
     localStorage.setItem('courses', JSON.stringify(courses));
     displayQuizzes();
     quizModal.style.display = 'none';
@@ -135,35 +178,37 @@ window.addEventListener('click', (event) => {
   }
 });
 
-// Parse quiz data from input
-function parseQuizData(data) {
-  const lines = data.split('\n');
-  const questions = [];
-  let currentQuestion = null;
-  lines.forEach(line => {
-    if (line.startsWith('Q:')) {
-      if (currentQuestion) {
-        questions.push(currentQuestion);
-      }
-      currentQuestion = { question: line.slice(2).trim(), options: [], answer: null, explanation: '' };
-    } else if (line.startsWith('A:')) {
-      currentQuestion.answer = line.slice(2).trim();
-    } else if (line.startsWith('E:')) {
-      currentQuestion.explanation = line.slice(2).trim();
-    } else if (line.startsWith('-')) {
-      currentQuestion.options.push(line.slice(1).trim());
-    }
-  });
-  if (currentQuestion) {
-    questions.push(currentQuestion);
-  }
-  return questions;
-}
-
 // Event Listener for Back Button
 backBtn.addEventListener('click', () => {
   window.location.href = 'index.html';
 });
 
-// Initialize the app
+// NEW: Export function
+function exportData() {
+  // Retrieve just the 'courses' data from localStorage
+  const storedData = localStorage.getItem('courses') || '[]';
+
+  // Convert that data to a Blob so we can download it
+  const fileContent = new Blob([storedData], { type: 'application/json' });
+
+  // Create a temporary link
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(fileContent);
+  link.download = 'exportedData.json'; // Name of the downloaded file
+  document.body.appendChild(link);
+
+  // Trigger the download
+  link.click();
+
+  // Cleanup
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
+}
+
+// Attach the export function to the export button (if it exists)
+if (exportBtn) {
+  exportBtn.addEventListener('click', exportData);
+}
+
+// Initialize the page
 displayQuizzes();
